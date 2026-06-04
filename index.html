@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Fin-Theft Detection System v2.1</title>
+<!--
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║   FIN-THEFT DETECTION SYSTEM  ·  Frontend UI  ·  v2.1               ║
+  ║   Copyright © Wai-Ajok Fin-Theft Detection Project                       ║
+  ║   MIT License — free to use with attribution                         ║
+  ║   Frameworks: RANK · GUARD · CYCLE · TRAIL · HUNT · PRIDE            ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+-->
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e1a;--surf:#111827;--surf2:#1a2235;--bord:#1e2d47;
+  --acc:#00d4aa;--acc2:#0ea5e9;--danger:#ef4444;--warn:#f59e0b;--ok:#10b981;
+  --txt:#e2e8f0;--muted:#64748b;
+  --mono:'IBM Plex Mono',monospace;--sans:'Space Grotesk',sans-serif;
+}
+body{background:var(--bg);color:var(--txt);font-family:var(--sans);min-height:100vh}
+.shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+
+/* sidebar */
+.sb{background:var(--surf);border-right:1px solid var(--bord);padding:1.25rem .85rem;display:flex;flex-direction:column;gap:.35rem}
+.brand{display:flex;align-items:center;gap:.55rem;padding:.4rem .3rem 1.25rem;border-bottom:1px solid var(--bord);margin-bottom:.35rem}
+.brand-ic{width:34px;height:34px;background:linear-gradient(135deg,var(--acc),var(--acc2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.brand-n{font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--acc)}
+.brand-s{font-size:9px;color:var(--muted);font-family:var(--mono);letter-spacing:.08em}
+.nav{display:flex;align-items:center;gap:.6rem;padding:.5rem .65rem;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;color:var(--muted);border:none;background:none;width:100%;text-align:left;transition:all .18s}
+.nav:hover{background:var(--surf2);color:var(--txt)}
+.nav.on{background:rgba(0,212,170,.08);color:var(--acc);border:1px solid rgba(0,212,170,.18)}
+.nav-ic{font-size:14px;width:18px;text-align:center}
+.nbadge{margin-left:auto;background:var(--danger);color:#fff;font-size:9px;padding:1px 6px;border-radius:20px;font-family:var(--mono)}
+.sb-foot{margin-top:auto;font-size:9px;color:var(--muted);font-family:var(--mono);padding:.5rem .65rem;border-top:1px solid var(--bord);line-height:1.8}
+.sb-foot span{color:var(--acc)}
+
+/* main */
+.main{display:flex;flex-direction:column}
+.topbar{background:var(--surf);border-bottom:1px solid var(--bord);padding:.75rem 1.75rem;display:flex;align-items:center;justify-content:space-between}
+.tb-title{font-size:14px;font-weight:700;letter-spacing:.02em}
+.tb-sub{font-size:10px;color:var(--muted);font-family:var(--mono)}
+.pill{display:flex;align-items:center;gap:.35rem;font-size:10px;font-family:var(--mono);color:var(--ok);background:rgba(16,185,129,.09);border:1px solid rgba(16,185,129,.18);padding:3px 11px;border-radius:20px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--ok);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* panels */
+.panel{padding:1.25rem 1.75rem;flex:1;overflow-y:auto;display:none}
+.panel.on{display:block}
+
+/* tags */
+.tag{font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:3px;letter-spacing:.06em;font-weight:600}
+.ta{background:rgba(0,212,170,.1);color:var(--acc);border:1px solid rgba(0,212,170,.25)}
+.tb2{background:rgba(14,165,233,.1);color:var(--acc2);border:1px solid rgba(14,165,233,.25)}
+.tw{background:rgba(245,158,11,.1);color:var(--warn);border:1px solid rgba(245,158,11,.25)}
+
+/* section header */
+.sh{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem}
+.sh h2{font-size:14px;font-weight:700;letter-spacing:.02em}
+
+/* fw chips */
+.fwc{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1rem}
+.chip{font-size:9px;font-family:var(--mono);padding:3px 8px;border-radius:3px;letter-spacing:.05em;font-weight:600;border:1px solid var(--bord);color:var(--muted)}
+.chip.on{border-color:var(--acc);color:var(--acc);background:rgba(0,212,170,.05)}
+
+/* upload */
+.uz{border:2px dashed var(--bord);border-radius:10px;padding:2rem;text-align:center;cursor:pointer;transition:all .25s;position:relative;background:var(--surf)}
+.uz:hover,.uz.drag{border-color:var(--acc);background:rgba(0,212,170,.03)}
+.uz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.uz-ic{font-size:32px;margin-bottom:.6rem;opacity:.45}
+.uz-t{font-size:13px;font-weight:600;margin-bottom:.25rem}
+.uz-h{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.prev-wrap{border-radius:9px;overflow:hidden;border:1px solid var(--bord);margin-top:.85rem;position:relative;display:none}
+.prev-img{width:100%;max-height:240px;object-fit:contain;display:block;background:#000}
+.scan-ov{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6)}
+.scan-ov.show{display:flex}
+.ring{width:70px;height:70px;border:3px solid var(--acc);border-radius:50%;border-top-color:transparent;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lbar{height:3px;background:var(--bord);border-radius:2px;overflow:hidden;margin-top:.6rem;display:none}
+.lbar.show{display:block}
+.lfill{height:100%;background:var(--acc);border-radius:2px;animation:ld 2.2s ease forwards}
+@keyframes ld{0%{width:0}85%{width:90%}100%{width:100%}}
+
+/* form */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-top:1rem}
+.fi{display:flex;flex-direction:column;gap:.3rem}
+.fi.full{grid-column:1/-1}
+label{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;font-family:var(--mono)}
+input,select,textarea{background:var(--surf2);border:1px solid var(--bord);color:var(--txt);padding:.5rem .75rem;border-radius:7px;font-size:12px;font-family:var(--sans);outline:none;transition:border .18s;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--acc)}
+select option{background:var(--surf2)}
+textarea{resize:vertical;min-height:52px;font-size:11px}
+.divider{border:none;border-top:1px solid var(--bord);margin:1rem 0}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.55rem 1.1rem;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .18s;font-family:var(--sans)}
+.bp{background:var(--acc);color:#0a0e1a}.bp:hover{filter:brightness(1.1)}.bp:disabled{opacity:.4;cursor:not-allowed}
+.bg2{background:transparent;color:var(--muted);border:1px solid var(--bord)}.bg2:hover{border-color:var(--acc);color:var(--acc)}
+.bd{background:rgba(239,68,68,.1);color:var(--danger);border:1px solid rgba(239,68,68,.25)}
+.brow{display:flex;gap:.6rem;margin-top:1rem;flex-wrap:wrap}
+.sp{width:12px;height:12px;border:2px solid transparent;border-top-color:currentColor;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+
+/* result */
+.rc{background:var(--surf);border-radius:10px;border:1px solid var(--bord);padding:1.1rem;margin-top:1rem;display:none}
+.rc.show{display:block}
+.rh{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
+.verd{display:flex;align-items:center;gap:.4rem;font-size:15px;font-weight:700}
+.verd.auth{color:var(--ok)}.verd.fake{color:var(--danger)}.verd.susp{color:var(--warn)}
+.cbar{height:5px;background:var(--bord);border-radius:3px;overflow:hidden;margin:.25rem 0}
+.cfill{height:100%;border-radius:3px;transition:width 1s ease}
+.dg{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-top:.85rem}
+.di{background:var(--surf2);border-radius:7px;padding:.55rem .75rem}
+.dl{font-size:9px;color:var(--muted);font-family:var(--mono);letter-spacing:.05em;margin-bottom:.2rem}
+.dv{font-size:12px;font-weight:600}
+.ai-box{background:var(--surf2);border-radius:7px;padding:.75rem;margin-top:.85rem;font-size:11px;line-height:1.7;border-left:3px solid var(--acc)}
+.sms-st{display:flex;align-items:center;gap:.6rem;padding:.6rem .85rem;border-radius:7px;margin-top:.85rem;font-size:11px;font-family:var(--mono);display:none}
+.sms-st.show{display:flex}
+.sms-ok{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.18);color:var(--ok)}
+.sms-er{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.18);color:var(--danger)}
+.alert{padding:.65rem .85rem;border-radius:7px;font-size:11px;font-family:var(--mono);margin-bottom:.85rem}
+.ai{background:rgba(14,165,233,.07);border:1px solid rgba(14,165,233,.18);color:var(--acc2)}
+.aw{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.18);color:var(--warn)}
+
+/* log */
+.lw{background:var(--surf);border-radius:10px;border:1px solid var(--bord);overflow:hidden}
+.ltb{padding:.75rem 1rem;border-bottom:1px solid var(--bord);display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+.ltb input{flex:1;min-width:180px;max-width:240px}
+table{width:100%;border-collapse:collapse;font-size:11px}
+thead tr{background:var(--surf2)}
+th{padding:.5rem .85rem;text-align:left;font-size:9px;font-family:var(--mono);color:var(--muted);letter-spacing:.07em;text-transform:uppercase;border-bottom:1px solid var(--bord)}
+td{padding:.6rem .85rem;border-bottom:1px solid rgba(30,45,71,.45)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.sb2{display:inline-flex;align-items:center;gap:.25rem;font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:3px;font-weight:600}
+.sok{background:rgba(16,185,129,.09);color:var(--ok);border:1px solid rgba(16,185,129,.22)}
+.sfk{background:rgba(239,68,68,.09);color:var(--danger);border:1px solid rgba(239,68,68,.22)}
+.swn{background:rgba(245,158,11,.09);color:var(--warn);border:1px solid rgba(245,158,11,.22)}
+.empty{text-align:center;padding:2.5rem;color:var(--muted);font-size:12px}
+.thumb{width:38px;height:26px;object-fit:cover;border-radius:3px;border:1px solid var(--bord)}
+.th-ph{width:38px;height:26px;background:var(--bord);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--muted)}
+.mono{font-family:var(--mono)}
+
+/* stats */
+.sr{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;margin-bottom:1.25rem}
+.sc{background:var(--surf);border:1px solid var(--bord);border-radius:10px;padding:.9rem 1.1rem}
+.sv{font-size:24px;font-weight:700;font-family:var(--mono)}
+.sl{font-size:10px;color:var(--muted);margin-top:.15rem}
+.sok2{color:var(--ok)}.sfk2{color:var(--danger)}.swn2{color:var(--warn)}.sbl{color:var(--acc2)}
+
+/* about */
+.fw-grid{display:grid;grid-template-columns:1fr 1fr;gap:.85rem}
+.fw-card{background:var(--surf);border:1px solid var(--bord);border-radius:10px;padding:1.1rem}
+.fw-head{display:flex;align-items:center;gap:.55rem;margin-bottom:.5rem}
+.fw-name{font-size:14px;font-weight:700;color:var(--acc);font-family:var(--mono)}
+.fw-full{font-size:9px;color:var(--muted);line-height:1.3}
+.fw-desc{font-size:11px;color:var(--txt);line-height:1.7;opacity:.85}
+
+/* copyright footer */
+.copy{background:var(--surf);border-top:1px solid var(--bord);padding:.6rem 1.75rem;display:flex;align-items:center;justify-content:space-between;font-size:9px;color:var(--muted);font-family:var(--mono)}
+.copy span{color:var(--acc)}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ── SIDEBAR ── -->
+<aside class="sb">
+  <div class="brand">
+    <div class="brand-ic">🛡</div>
+    <div><div class="brand-n">FIN-THEFT</div><div class="brand-s">DETECTION</div></div>
+  </div>
+  <button class="nav on" onclick="nav('scan',this)"><span class="nav-ic">🔍</span> Scan Currency</button>
+  <button class="nav" onclick="nav('log',this)"><span class="nav-ic">📋</span> Scan Log <span class="nbadge" id="nbadge">0</span></button>
+  <button class="nav" onclick="nav('stats',this)"><span class="nav-ic">📊</span> Analytics</button>
+  <button class="nav" onclick="nav('about',this)"><span class="nav-ic">ℹ</span> Frameworks</button>
+  <div class="sb-foot">
+    Protecting citizens<br>from fraud<br>
+    <span>RANK · GUARD · CYCLE<br>TRAIL · HUNT · PRIDE</span>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<main class="main">
+  <div class="topbar">
+    <div><div class="tb-title">Currency Authentication System</div><div class="tb-sub">counterfeit detection · SMS alerts · Persistent ledger</div></div>
+    <div class="pill"><span class="dot"></span><span id="api-status">Checking…</span></div>
+  </div>
+
+  <!-- SCAN -->
+  <div class="panel on" id="p-scan">
+    <div class="fwc">
+      <span class="chip on">RANK</span><span class="chip on">GUARD</span><span class="chip on">CYCLE</span>
+      <span class="chip on">TRAIL</span><span class="chip on">HUNT</span><span class="chip on">PRIDE</span>
+    </div>
+    <div class="alert ai" id="api-banner" style="display:none"></div>
+
+    <div class="sh"><h2>Upload Currency Image</h2><span class="tag ta">HUNT PROTOCOL</span></div>
+    <div class="uz" id="dz">
+      <input type="file" accept="image/*" id="fi" onchange="handleFile(event)">
+      <div class="uz-ic">💵</div>
+      <div class="uz-t">Drop currency image or click to browse</div>
+      <div class="uz-h">JPG · PNG · WEBP · max 15 MB</div>
+    </div>
+    <div class="prev-wrap" id="pw">
+      <img id="pi" class="prev-img" alt="Currency preview">
+      <div class="scan-ov" id="sov"><div class="ring"></div></div>
+    </div>
+    <div class="lbar" id="lb"><div class="lfill"></div></div>
+
+    <hr class="divider">
+    <div class="sh"><h2>Owner & Transaction Details</h2><span class="tag tb2">TRAIL FRAMEWORK</span></div>
+
+    <div class="fg">
+      <div class="fi"><label>Owner Name</label><input id="oname" placeholder="e.g. Daoud Al-Rashid"></div>
+      <div class="fi"><label>Phone / SMS Number</label><input id="ophone" type="tel" placeholder="+211 9X XXX XXXX"></div>
+      <div class="fi"><label>Currency Type</label>
+        <select id="ctype">
+          <option value="USD">USD – US Dollar</option>
+          <option value="SDG">SDG – Sudanese Pound</option>
+          <option value="SSP">SSP – South Sudanese Pound</option>
+          <option value="ETB">ETB – Ethiopian Birr</option>
+          <option value="KES">KES – Kenyan Shilling</option>
+          <option value="EUR">EUR – Euro</option>
+          <option value="GBP">GBP – Pound Sterling</option>
+          <option value="EGP">EGP – Egyptian Pound</option>
+          <option value="OTHER">OTHER</option>
+        </select>
+      </div>
+      <div class="fi"><label>Denomination</label><input id="denom" placeholder="e.g. 100"></div>
+      <div class="fi"><label>Market / Location</label><input id="loc" placeholder="e.g. Custom Market, Juba"></div>
+      <div class="fi"><label>Dealer / Source</label><input id="dealer" placeholder="Report black-market dealer (optional)"></div>
+      <div class="fi full"><label>Notes</label><textarea id="notes" placeholder="Additional context about this transaction…"></textarea></div>
+    </div>
+
+    <div class="brow">
+      <button class="btn bp" id="sbtn" onclick="scanCurrency()" disabled>🔬 Analyze Currency</button>
+      <button class="btn bg2" onclick="clearForm()">✕ Clear</button>
+    </div>
+
+    <!-- RESULT CARD -->
+    <div class="rc" id="rcard">
+      <div class="rh">
+        <div class="verd" id="vlabel">✅ AUTHENTIC</div>
+        <div class="mono" style="font-size:10px;color:var(--muted)" id="sidlabel"></div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:.2rem">
+          <span style="color:var(--muted)">Developer Confidence</span><span class="mono" style="font-weight:600" id="cpct"></span>
+        </div>
+        <div class="cbar"><div class="cfill" id="cbar"></div></div>
+      </div>
+      <div class="dg">
+        <div class="di"><div class="dl">Serial Pattern</div><div class="dv" id="d-serial">—</div></div>
+        <div class="di"><div class="dl">Watermark</div><div class="dv" id="d-wm">—</div></div>
+        <div class="di"><div class="dl">Security Thread</div><div class="dv" id="d-thread">—</div></div>
+        <div class="di"><div class="dl">Microprint</div><div class="dv" id="d-micro">—</div></div>
+        <div class="di"><div class="dl">Ink Quality</div><div class="dv" id="d-ink">—</div></div>
+        <div class="di"><div class="dl">Texture Score</div><div class="dv" id="d-tex">—</div></div>
+      </div>
+      <div class="ai-box" id="aibox"></div>
+      <div class="sms-st" id="smsst"><span id="smsic"></span><span id="smsmsg"></span></div>
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div class="panel" id="p-log">
+    <div class="sh"><h2>Scan History</h2><span class="tag tb2">CYCLE ENGINE</span></div>
+    <div class="lw">
+      <div class="ltb">
+        <input placeholder="🔍  Search name, currency, verdict…" id="srch" oninput="renderLog()">
+        <button class="btn bg2" onclick="exportCSV()" style="font-size:10px;padding:.4rem .8rem">⬇ Export CSV</button>
+        <button class="btn bd" onclick="clearAllRecords()" style="font-size:10px;padding:.4rem .8rem">🗑 Clear All</button>
+      </div>
+      <div id="logbody"></div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="panel" id="p-stats">
+    <div class="sh"><h2>Analytics Dashboard</h2><span class="tag tw">PRIDE METRICS</span></div>
+    <div class="sr">
+      <div class="sc"><div class="sv sbl" id="st">0</div><div class="sl">Total Scans</div></div>
+      <div class="sc"><div class="sv sok2" id="sa">0</div><div class="sl">Authentic</div></div>
+      <div class="sc"><div class="sv sfk2" id="sf">0</div><div class="sl">Counterfeit</div></div>
+      <div class="sc"><div class="sv swn2" id="sw">0</div><div class="sl">Suspicious</div></div>
+    </div>
+    <div style="background:var(--surf);border:1px solid var(--bord);border-radius:10px;padding:1.25rem">
+      <div style="font-size:12px;font-weight:600;margin-bottom:.85rem">Detection by Currency Type</div>
+      <div id="barchart"></div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <div class="panel" id="p-about">
+    <div class="sh"><h2>Operational Frameworks</h2><span class="tag ta">SYSTEM DESIGN</span></div>
+    <div class="alert ai" style="margin-bottom:1rem">
+      Built to protect citizens<strong>from counterfeit</strong> — a man who lost $100 at the Custom Market to black-market dealers. No technology existed to verify his currency. This system changes that.
+    </div>
+    <div class="fw-grid" id="fwgrid"></div>
+  </div>
+
+  <!-- COPYRIGHT FOOTER -->
+  <footer class="copy">
+    <div>© Wai-Ajok <span>Fin-Theft Detection Project</span> · MIT License · Built for frontier-market citizen protection</div>
+    <div>Frameworks: <span>RANK · GUARD · CYCLE · TRAIL · HUNT · PRIDE</span> · Powered by Innovation</div>
+  </footer>
+</main>
+</div>
+
+<script>
+const API = '';  // same origin — Flask serves both
+
+// ── State ──────────────────────────────────────────────────────────────────
+let currentFile = null;
+let scanning    = false;
+let records     = [];
+
+// ── Init ───────────────────────────────────────────────────────────────────
+(async function init() {
+  console.log('%c🛡 FIN-THEFT DETECTION v2.1 initializing…', 'color: #00d4aa; font-weight: bold; font-size: 14px');
+  checkHealth();
+  await loadRecords();
+  renderAbout();
+  console.log('✓ UI initialized | Records loaded:', records.length);
+  
+  // drag-drop
+  const dz = document.getElementById('dz');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); 
+    dz.classList.remove('drag');
+    const f = e.dataTransfer.files[0];
+    if (f && f.type.startsWith('image/')) {
+      console.log('📸 File dropped:', f.name);
+      document.getElementById('fi').files = e.dataTransfer.files;
+      handleFile({ target: { files: [f] } });
+    } else {
+      console.warn('❌ Invalid file type for drop');
+    }
+  });
+  console.log('✓ Drag-drop handlers ready');
+})();
+
+// ── Navigation ─────────────────────────────────────────────────────────────
+function nav(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.nav').forEach(n => n.classList.remove('on'));
+  document.getElementById('p-' + id).classList.add('on');
+  btn.classList.add('on');
+  if (id === 'log')   { loadRecords().then(renderLog); }
+  if (id === 'stats') { loadStats(); }
+}
+
+// ── Health check ───────────────────────────────────────────────────────────
+async function checkHealth() {
+  try {
+    const r = await fetch(API + '/api/health');
+    const d = await r.json();
+    const status = d.api_key_set ? 'System Online ✓' : 'No API Key ⚠';
+    document.getElementById('api-status').textContent = status;
+    console.log('✓ Backend health:', status, '| Frameworks:', d.frameworks.join(' · '));
+    if (!d.api_key_set) {
+      const b = document.getElementById('api-banner');
+      b.textContent = '⚠ ANTHROPIC_API_KEY not set — scans will return demo verdicts. ' +
+        'Set the key in your environment and restart Flask.';
+      b.style.display = 'block';
+      console.warn('⚠ API key not configured — demo mode active');
+    }
+  } catch (e) {
+    console.error('❌ Backend unreachable:', e.message);
+    document.getElementById('api-status').textContent = 'Backend Offline ✗';
+  }
+}
+
+// ── File handling ──────────────────────────────────────────────────────────
+function handleFile(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  
+  // Validate file size (max 15 MB)
+  if (f.size > 15 * 1024 * 1024) {
+    alert('File too large. Max 15 MB.');
+    return;
+  }
+  
+  // Validate file type
+  if (!f.type.startsWith('image/')) {
+    alert('Please select an image file (JPG, PNG, WEBP, etc.)');
+    return;
+  }
+  
+  currentFile = f;
+  const url = URL.createObjectURL(f);
+  document.getElementById('pi').src = url;
+  document.getElementById('pw').style.display = 'block';
+  document.getElementById('sbtn').disabled = false;
+  document.getElementById('sbtn').style.opacity = '1';
+  document.getElementById('sbtn').style.cursor = 'pointer';
+  document.getElementById('rcard').classList.remove('show');
+  document.getElementById('smsst').classList.remove('show');
+  console.log('✓ File ready:', f.name, '—', (f.size/1024).toFixed(1), 'KB');
+}
+
+// ── Scan ───────────────────────────────────────────────────────────────────
+async function scanCurrency() {
+  if (scanning || !currentFile) {
+    console.warn('Scan blocked: scanning=' + scanning + ', file=' + (currentFile ? 'yes' : 'no'));
+    return;
+  }
+  
+  scanning = true;
+  const btn = document.getElementById('sbtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="sp"></span> Analyzing…';
+  document.getElementById('sov').classList.add('show');
+  document.getElementById('lb').classList.add('show');
+  document.getElementById('rcard').classList.remove('show');
+  document.getElementById('smsst').classList.remove('show');
+
+  const fd = new FormData();
+  fd.append('image',        currentFile);
+  fd.append('owner_name',   document.getElementById('oname').value.trim()  || 'Unknown');
+  fd.append('owner_phone',  document.getElementById('ophone').value.trim());
+  fd.append('currency_type',document.getElementById('ctype').value);
+  fd.append('denomination', document.getElementById('denom').value.trim());
+  fd.append('location',     document.getElementById('loc').value.trim());
+  fd.append('dealer',       document.getElementById('dealer').value.trim());
+  fd.append('notes',        document.getElementById('notes').value.trim());
+
+  let data;
+  try {
+    console.log('📤 Sending scan request to', API + '/api/scan');
+    const resp = await fetch(API + '/api/scan', { method: 'POST', body: fd });
+    data = await resp.json();
+    if (!resp.ok) {
+      console.error('❌ API Error:', data);
+      throw new Error(data.error || 'Server error: ' + resp.status);
+    }
+    console.log('📥 Scan response received:', data);
+  } catch (err) {
+    console.error('❌ Scan failed:', err.message);
+    alert('Scan failed: ' + err.message);
+    resetScanUI(btn); 
+    return;
+  }
+
+  resetScanUI(btn);
+  showResult(data);
+  await loadRecords();
+}
+
+function resetScanUI(btn) {
+  scanning = false;
+  btn.disabled = false;
+  btn.innerHTML = '🔬 Analyze Currency';
+  document.getElementById('sov').classList.remove('show');
+  document.getElementById('lb').classList.remove('show');
+}
+
+function showResult(d) {
+  const card = document.getElementById('rcard');
+  card.classList.add('show');
+
+  const vm = {
+    AUTHENTIC:   { icon: '✅', cls: 'auth', color: 'var(--ok)'     },
+    COUNTERFEIT: { icon: '🚨', cls: 'fake', color: 'var(--danger)'  },
+    SUSPICIOUS:  { icon: '⚠️', cls: 'susp', color: 'var(--warn)'   },
+  };
+  const v = vm[d.verdict] || vm['SUSPICIOUS'];
+
+  document.getElementById('vlabel').className = 'verd ' + v.cls;
+  document.getElementById('vlabel').textContent = v.icon + ' ' + d.verdict;
+  document.getElementById('sidlabel').textContent = '#' + d.scan_id;
+  document.getElementById('cpct').textContent = d.confidence + '%';
+
+  const bar = document.getElementById('cbar');
+  bar.style.width   = d.confidence + '%';
+  bar.style.background = v.color;
+
+  const det = d.details || {};
+  document.getElementById('d-serial').textContent  = det.serial_pattern  || '—';
+  document.getElementById('d-wm').textContent      = det.watermark        || '—';
+  document.getElementById('d-thread').textContent  = det.security_thread  || '—';
+  document.getElementById('d-micro').textContent   = det.microprint       || '—';
+  document.getElementById('d-ink').textContent     = det.ink_quality      || '—';
+  document.getElementById('d-tex').textContent     = (det.texture_score != null ? det.texture_score + '/10' : '—');
+
+  document.getElementById('aibox').textContent = '💡 ' + (d.summary || '');
+
+  const sms = document.getElementById('smsst');
+  if (d.sms && d.sms.phone) {
+    sms.className = 'sms-st show ' +
+      (d.sms.status === 'SIMULATED' ? 'sms-ok' : 'sms-ok');
+    document.getElementById('smsic').textContent = '📲';
+    document.getElementById('smsmsg').textContent =
+      `SMS ${d.sms.status} → ${d.sms.phone} (${d.verdict})`;
+  } else if (!d.sms || !d.sms.phone) {
+    sms.className = 'sms-st show sms-er';
+    document.getElementById('smsic').textContent = '📵';
+    document.getElementById('smsmsg').textContent =
+      'No phone number provided — SMS not sent.';
+  }
+}
+
+// ── Records ────────────────────────────────────────────────────────────────
+async function loadRecords() {
+  try {
+    const r = await fetch(API + '/api/records');
+    records = await r.json();
+    document.getElementById('nbadge').textContent = records.length;
+  } catch(e) { records = []; }
+}
+
+function renderLog() {
+  const q = (document.getElementById('srch').value || '').toLowerCase();
+  const filtered = records.filter(r =>
+    !q || [r.owner_name, r.currency_type, r.verdict, r.owner_phone, r.location]
+      .join(' ').toLowerCase().includes(q)
+  );
+  const body = document.getElementById('logbody');
+  if (!filtered.length) {
+    body.innerHTML = '<div class="empty">No records found. Scan your first currency note to begin.</div>';
+    return;
+  }
+  const bmap = { AUTHENTIC: 'sok', COUNTERFEIT: 'sfk', SUSPICIOUS: 'swn' };
+  body.innerHTML = `<table><thead><tr>
+    <th>Scan ID</th><th>Preview</th><th>Owner</th><th>Phone</th>
+    <th>Currency</th><th>Location</th><th>Verdict</th><th>Conf.</th><th>Date</th><th></th>
+  </tr></thead><tbody>
+  ${filtered.map(r => {
+    const date = new Date(r.timestamp).toLocaleString('en-GB', {
+      day: '2-digit', month: 'short', year: '2-digit',
+      hour: '2-digit', minute: '2-digit'
+    });
+    const thumb = r.image_thumb
+      ? `<img class="thumb" src="data:image/jpeg;base64,${r.image_thumb}" onerror="this.style.display='none'" alt="thumb">`
+      : '<div class="th-ph">IMG</div>';
+    return `<tr>
+      <td class="mono" style="font-size:10px;color:var(--muted)">${r.id}</td>
+      <td>${thumb}</td>
+      <td style="font-weight:500">${r.owner_name || '—'}</td>
+      <td class="mono" style="font-size:10px">${r.owner_phone || '—'}</td>
+      <td class="mono">${r.currency_type} ${r.denomination || ''}</td>
+      <td style="font-size:10px;color:var(--muted)">${r.location || '—'}</td>
+      <td><span class="sb2 ${bmap[r.verdict] || 'swn'}">${r.verdict}</span></td>
+      <td class="mono">${r.confidence}%</td>
+      <td style="font-size:10px;color:var(--muted)">${date}</td>
+      <td><button class="btn bd" style="font-size:9px;padding:2px 7px" onclick="deleteRecord('${r.id}')">✕</button></td>
+    </tr>`;
+  }).join('')}
+  </tbody></table>`;
+}
+
+async function deleteRecord(id) {
+  if (!confirm('Delete scan ' + id + '?')) return;
+  await fetch(API + '/api/records/' + id, { method: 'DELETE' });
+  await loadRecords();
+  renderLog();
+}
+
+async function clearAllRecords() {
+  if (!confirm('Delete ALL scan records? This cannot be undone.')) return;
+  for (const r of records) {
+    await fetch(API + '/api/records/' + r.id, { method: 'DELETE' });
+  }
+  await loadRecords();
+  renderLog();
+}
+
+function exportCSV() {
+  if (!records.length) return;
+  const cols = ['id','timestamp','owner_name','owner_phone','currency_type',
+    'denomination','location','dealer','verdict','confidence','alert_severity','ai_summary'];
+  const csv = [cols.join(','),
+    ...records.map(r => cols.map(k => `"${String(r[k]||'').replace(/"/g,'""')}"`).join(','))
+  ].join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'fin_theft_log_' + Date.now() + '.csv';
+  a.click();
+}
+
+// ── Stats ──────────────────────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const r = await fetch(API + '/api/stats');
+    const d = await r.json();
+    document.getElementById('st').textContent = d.total;
+    document.getElementById('sa').textContent = d.authentic;
+    document.getElementById('sf').textContent = d.counterfeit;
+    document.getElementById('sw').textContent = d.suspicious;
+    renderBarChart(d.by_currency || {});
+  } catch(e) {}
+}
+
+function renderBarChart(byCurrency) {
+  const area = document.getElementById('barchart');
+  if (!Object.keys(byCurrency).length) {
+    area.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:1.5rem">No data yet — begin scanning to populate analytics.</div>';
+    return;
+  }
+  area.innerHTML = Object.entries(byCurrency).map(([cur, v]) => {
+    const t = (v.AUTHENTIC||0) + (v.COUNTERFEIT||0) + (v.SUSPICIOUS||0) || 1;
+    return `<div style="margin-bottom:.85rem">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:.3rem">
+        <span class="mono" style="font-weight:600">${cur}</span>
+        <span style="color:var(--muted);font-size:10px">${t} scan${t!==1?'s':''}</span>
+      </div>
+      <div style="display:flex;height:18px;border-radius:3px;overflow:hidden;gap:1px">
+        ${v.AUTHENTIC  ?`<div style="flex:${v.AUTHENTIC};background:var(--ok);display:flex;align-items:center;justify-content:center;font-size:9px;color:#0a0e1a;font-weight:700">${v.AUTHENTIC}</div>`:''}
+        ${v.SUSPICIOUS ?`<div style="flex:${v.SUSPICIOUS};background:var(--warn);display:flex;align-items:center;justify-content:center;font-size:9px;color:#0a0e1a;font-weight:700">${v.SUSPICIOUS}</div>`:''}
+        ${v.COUNTERFEIT?`<div style="flex:${v.COUNTERFEIT};background:var(--danger);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700">${v.COUNTERFEIT}</div>`:''}
+      </div>
+      <div style="display:flex;gap:.85rem;font-size:9px;margin-top:.25rem;font-family:var(--mono)">
+        <span style="color:var(--ok)">■ ${v.AUTHENTIC||0} auth</span>
+        <span style="color:var(--warn)">■ ${v.SUSPICIOUS||0} susp</span>
+        <span style="color:var(--danger)">■ ${v.COUNTERFEIT||0} fake</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── About ──────────────────────────────────────────────────────────────────
+function renderAbout() {
+  const FW = [
+    ['RANK','Risk Assessment & Notification Kernel','Scores each banknote 0–100 across 6 forensic vectors. Verdict mapping: ≤40 = COUNTERFEIT, 41–69 = SUSPICIOUS, 70+ = AUTHENTIC.','🎯'],
+    ['GUARD','Grounded Universal Anomaly & Risk Defense','Safety rail that overrides to SUSPICIOUS if AI confidence falls below 45%, preventing false-negative counterfeit releases.','🛡'],
+    ['CYCLE','Centralized Yield & Currency Ledger Engine','SQLite persistent backend: every scan, verdict, owner contact, and timestamp stored in tamper-evident structured form.','🔄'],
+    ['TRAIL','Transaction Record & Alert Inference Layer','Ties the owner's phone number to the scan record. Dispatches SMS the moment a verdict is issued — no manual step required.','📡'],
+    ['HUNT','Heuristic UV & Note Tracker','Claude Vision AI multi-feature image analysis: serial encoding, watermark presence, thread geometry, ink spectral signature, texture.','🔬'],
+    ['PRIDE','Performance & Risk Intelligence Dashboard Engine','Real-time KPI surface: scan counts, fake-rate %, by-currency breakdown, recent scans, and operator accountability log.','📊'],
+  ];
+  document.getElementById('fwgrid').innerHTML = FW.map(([n,f,d,ic]) => `
+    <div class="fw-card">
+      <div class="fw-head">
+        <span style="font-size:20px">${ic}</span>
+        <div><div class="fw-name">${n}</div><div class="fw-full">${f}</div></div>
+      </div>
+      <div class="fw-desc">${d}</div>
+    </div>`).join('');
+}
+
+// ── Clear form ─────────────────────────────────────────────────────────────
+function clearForm() {
+  ['oname','ophone','denom','loc','dealer','notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('ctype').value = 'USD';
+  document.getElementById('pw').style.display = 'none';
+  document.getElementById('rcard').classList.remove('show');
+  document.getElementById('lb').classList.remove('show');
+  document.getElementById('sbtn').disabled = true;
+  document.getElementById('sbtn').innerHTML = '🔬 Analyze Currency';
+  currentFile = null;
+}
+</script>
+</body>
+</html>
